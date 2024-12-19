@@ -29,22 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-    // Add enter key listener only once
-    const messageInput = document.getElementById('messageInput');
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    
-    // Add enter key listener
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
 
 let ws;
 
@@ -102,8 +86,3 @@ document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket(); // Connect to WebSocket only once
 });
     
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
