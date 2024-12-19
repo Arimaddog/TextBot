@@ -1,7 +1,11 @@
 const express = require('express');
 const path = require('path');
+const { WebSocketServer } = require('ws');
+const http = require('http');
+
 const app = express();
-const port = 3000;
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
 
 // Middleware
 app.use(express.json());
@@ -10,32 +14,35 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Store messages in memory
 let messages = [];
 
-// Serve index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// WebSocket connection handling
+wss.on('connection', (ws) => {
+    // Send existing messages to new clients
+    ws.send(JSON.stringify({ type: 'messages', data: messages }));
 });
 
-// Get messages
-app.get('/api/messages', (req, res) => {
-    res.json(messages);
-});
+// Broadcast to all clients
+function broadcast(data) {
+    wss.clients.forEach(client => {
+        client.send(JSON.stringify(data));
+    });
+}
 
-// Post new message
-// ... existing code ...
-
+// API endpoints
 app.post('/api/messages', (req, res) => {
     const message = req.body.message;
     if (message) {
-        // Use unshift instead of push to add messages to the beginning
         messages.unshift(message);
+        // Broadcast new message to all clients
+        broadcast({ type: 'newMessage', data: messages });
         res.json({ success: true });
     } else {
         res.status(400).json({ success: false, error: 'Message is required' });
     }
 });
 
-// ... rest of the code ...
+// ... rest of your endpoints ...
 
-app.listen(port, () => {
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
