@@ -28,6 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+    // Add enter key listener only once
+    const messageInput = document.getElementById('messageInput');
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
     
     // Add enter key listener
     document.getElementById('messageInput').addEventListener('keypress', (e) => {
@@ -49,7 +58,7 @@ function connectWebSocket() {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'newMessage') {
-            // Only update messages for new messages
+            // Update messages only for new messages
             updateMessages(data.data);
         }
     };
@@ -71,6 +80,8 @@ function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const message = messageInput.value.trim();
     
+    console.log('Sending message:', message); // Debug log
+    
     if (message) {
         fetch('/api/messages', {
             method: 'POST',
@@ -81,18 +92,18 @@ function sendMessage() {
         })
         .then(response => response.json())
         .then(() => {
-            messageInput.value = '';
+            messageInput.value = ''; // Clear the input field
         })
         .catch(error => console.error('Error:', error));
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    connectWebSocket();
+    connectWebSocket(); // Connect to WebSocket only once
+});
     
     document.getElementById('messageInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             sendMessage();
         }
     });
-});
