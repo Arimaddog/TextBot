@@ -33,23 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
 let ws;
 
 function connectWebSocket() {
-    // Use wss:// for production (https) and ws:// for local development
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}`;
-    
     ws = new WebSocket(wsUrl);
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'newMessage') {
-            // Update messages only for new messages
+        if (data.type === 'messages') {
+            // Load all messages for new clients
+            updateMessages(data.data);
+        } else if (data.type === 'newMessage') {
+            // Update messages with the new message
             updateMessages(data.data);
         }
     };
 
     ws.onclose = () => {
-        // Reconnect if connection is lost
-        setTimeout(connectWebSocket, 1000);
+        setTimeout(connectWebSocket, 1000); // Attempt reconnect if disconnected
     };
 }
 
@@ -59,6 +59,7 @@ function updateMessages(messages) {
         .map(msg => `<div class="message">${msg}</div>`)
         .join('');
 }
+
 
 function sendMessage() {
     const messageInput = document.getElementById('messageInput');

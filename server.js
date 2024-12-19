@@ -20,10 +20,17 @@ app.get('/', (req, res) => {
 let messages = [];
 
 // WebSocket connection handling
+// WebSocket connection handling
 wss.on('connection', (ws) => {
-    // Send existing messages to new clients
+    // Send existing messages to the new client immediately
     ws.send(JSON.stringify({ type: 'messages', data: messages }));
+
+    // Optionally, handle additional WebSocket events for this client
+    ws.on('message', (message) => {
+        console.log(`Received: ${message}`);
+    });
 });
+
 
 // Broadcast to all clients
 function broadcast(data) {
