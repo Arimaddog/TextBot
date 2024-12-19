@@ -18,8 +18,16 @@ function startPolling() {
 
 // Update the DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
-    fetchMessages();
-    startPolling(); // Start polling for updates
+    connectWebSocket(); // Connect to WebSocket
+
+    // Add enter key listener only once
+    const messageInput = document.getElementById('messageInput');
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+});
     
     // Add enter key listener
     document.getElementById('messageInput').addEventListener('keypress', (e) => {
@@ -27,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sendMessage();
         }
     });
-});
+
 
 let ws;
 
@@ -40,7 +48,8 @@ function connectWebSocket() {
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'messages' || data.type === 'newMessage') {
+        if (data.type === 'newMessage') {
+            // Only update messages for new messages
             updateMessages(data.data);
         }
     };
