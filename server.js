@@ -11,6 +11,11 @@ const wss = new WebSocketServer({ server });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve index.html on the root URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Store messages in memory
 let messages = [];
 
@@ -40,8 +45,7 @@ app.post('/api/messages', (req, res) => {
     }
 });
 
-// ... rest of your endpoints ...
-
+// Start the server
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
